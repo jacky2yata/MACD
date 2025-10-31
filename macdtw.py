@@ -913,48 +913,48 @@ def main():
     # 执行分析按钮
     if st.sidebar.button("🚀 執行智能分析", type="primary", use_container_width=True):
         with st.spinner(f"正在分析 {ticker}..."):
-        # 载入数据
-        @st.cache_data(ttl=3600, show_spinner=False)
-        def load_data(ticker, period):
-            import yfinance as yf
-            from pandas_datareader import data as pdr
-            import pandas as pd
-    
-            # 修正 yfinance 雲端連線問題
-            yf.pdr_override()
-    
-            try:
-                # 自動補上台股代碼
-                if not ticker.endswith(".TW") and ticker.isdigit():
-                    ticker = ticker + ".TW"
-    
-                # 嘗試主要來源
-                data = yf.download(
-                    ticker,
-                    period=period,
-                    progress=False,
-                    auto_adjust=True,
-                    timeout=15
-                )
-    
-                # 若主要來源為空，嘗試 pandas_datareader 備援
-                if data is None or data.empty:
-                    data = pdr.get_data_yahoo(ticker)
-    
-                # 若還是空，回傳 None
-                if data is None or data.empty:
-                    return None
-    
-                # 處理多層欄位（有時候會出現在多指標下載時）
-                if isinstance(data.columns, pd.MultiIndex):
-                    data.columns = data.columns.droplevel(1)
-    
-                return data
-    
-            except Exception as e:
-                st.warning(f"資料抓取錯誤：{e}")
-                return None
+            # 载入数据
+            @st.cache_data(ttl=3600, show_spinner=False)
+            def load_data(ticker, period):
+                import yfinance as yf
+                from pandas_datareader import data as pdr
+                import pandas as pd
 
+                # 修正 yfinance 雲端連線問題
+                yf.pdr_override()
+
+                try:
+                    # 自動補上台股代碼
+                    if not ticker.endswith(".TW") and ticker.isdigit():
+                        ticker = ticker + ".TW"
+
+                    # 嘗試主要來源
+                    data = yf.download(
+                        ticker,
+                        period=period,
+                        progress=False,
+                        auto_adjust=True,
+                        timeout=15
+                    )
+
+                    # 若主要來源為空，嘗試 pandas_datareader 備援
+                    if data is None or data.empty:
+                        data = pdr.get_data_yahoo(ticker)
+
+                    # 若還是空，回傳 None
+                    if data is None or data.empty:
+                        return None
+
+                    # 處理多層欄位（有時候會出現在多指標下載時）
+                    if isinstance(data.columns, pd.MultiIndex):
+                        data.columns = data.columns.droplevel(1)
+
+                    return data
+
+                except Exception as e:
+                    st.warning(f"資料抓取錯誤：{e}")
+                    return None
+            
             
             df = load_data(ticker, period)
             
@@ -1276,6 +1276,4 @@ def main():
     """)
 
 if __name__ == "__main__":
-
     main()
-
